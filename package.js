@@ -15,6 +15,7 @@ Package.onUse(function (api) {
     'underscore',
     'minimongo',
     'ejson',
+    'localforage',
     'ground:util@0.1.9',
     'ground:servertime@0.0.3',
     //'ground:minimax@1.0.1', // Its implied by ground:util
@@ -42,6 +43,7 @@ Package.onUse(function (api) {
     'wrap.collection.js',
     'wrap.eventemitter.js',
     'wrap.proto.eventemitter.js',
+    'localforageadapter.js'
     ], 'client');
   api.addFiles('groundDB.server.js', 'server');
 });

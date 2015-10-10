@@ -173,7 +173,7 @@ _groundDbConstructor = function(collection, options) {
   }
 
   // Get the best storage available
-  self.storage = Store.create({
+  self.storage = new Store.localForage({
     // We allow the user to set a prefix for the storage. Its mainly ment for
     // testing purposes, since the prefixing allows the tests to simulate more
     // complex scenarios
@@ -208,8 +208,7 @@ _groundDbConstructor = function(collection, options) {
   self._localOnly = {};
 
   // Clean up the database and align to subscription
-  _cleanUpLocalData.call(self);
-
+  //_cleanUpLocalData.call(self);
 
   // Add the emitter of "changed" events
   _addChangedEmitter.call(self);
