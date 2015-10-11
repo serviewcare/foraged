@@ -412,7 +412,7 @@ var _loadDatabase = function() {
   Ground.emit('resume', { type: 'database', collection: self.name });
 
   // Load object from localstorage
-  self.storage.getItem('data', function(err, data) {
+  self.storage.getItem('data', function(data, err) {
     if (err) {
       // XXX:
     } else {
@@ -464,7 +464,7 @@ var _saveDatabase = function() {
       Ground.emit('cache', { type: 'database', collection: self.name });
       var minifiedDb = MiniMaxDB.minify(_groundUtil.getDatabaseMap(self));
       // Save the collection into localstorage
-      self.storage.setItem('data', minifiedDb, function(err, result) {
+      self.storage.setItem('data', minifiedDb, function(result, err) {
         // Emit feedback
         if (err) {
           // Emit error
@@ -734,7 +734,7 @@ var resumeWaitingMethods = function() {
 
 
 var loadMissingMethods = function(callback) {
-  _methodsStorage.getItem('methods', function(err, data) {
+  _methodsStorage.getItem('methods', function(data, err) {
     test.log('RESUME', 'methods loaded into memory');
     if (err) {
       // XXX:
@@ -789,7 +789,7 @@ var _saveMethods = function() {
     // Save outstanding methods to localstorage
     var methods = _getMethodsList();
 //test.log('SAVE METHODS', JSON.stringify(methods));
-    _methodsStorage.setItem('methods', MiniMaxMethods.minify(methods), function(err, result) {
+    _methodsStorage.setItem('methods', MiniMaxMethods.minify(methods), function(result, err) {
       // XXX:
     });
 
@@ -825,7 +825,7 @@ var _syncDatabase = function() {
       self.collection.emit('sync');
       Ground.emit('sync', { type: 'database', collection: self.name });
       // Hard reset database?
-      self.storage.getItem('data', function(err, data) {
+      self.storage.getItem('data', function(data, err) {
         if (err) {
           //
           throw err;

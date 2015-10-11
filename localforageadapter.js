@@ -372,7 +372,7 @@ if (_storage) {
 
                             try {
                                 if (item && !error) {
-                                    result[nextKey.replace(regex, '')] = item && EJSON.parse(item) || item;
+                                    result[nextKey] = item;
                                 }
                                 else {
                                     console.log("LocalForage Driver Data error " + error + ": KEY(" + nextKey + ")");
