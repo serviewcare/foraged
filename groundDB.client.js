@@ -204,6 +204,8 @@ _groundDbConstructor = function(collection, options) {
   // Flag true/false depending if database is loaded from local
   self._databaseLoaded = false;
 
+  self.databaseLoaded = new ReactiveVar(false);
+
   // Map local-only - this makes sure that localstorage matches remote loaded db
   self._localOnly = {};
 
@@ -414,6 +416,7 @@ var _loadDatabase = function() {
   // Load object from localstorage
   self.storage.getItem('data', function(data, err) {
     if (err) {
+      console.log("ERROR LOADING " + self.name);
       // XXX:
     } else {
 
@@ -423,6 +426,7 @@ var _loadDatabase = function() {
       // Maxify the data
       var docs = data && MiniMaxDB.maxify(data) || {};
 
+      var docsToInsert = [];
       // Initialize client documents
       _groundUtil.each(_checkDocs.call(self, docs || {} ), function(doc) {
         // Test if document allready exists, this is a rare case but accounts
@@ -435,14 +439,26 @@ var _loadDatabase = function() {
             // If online database then mark the doc as local only TODO:
             self._localOnly[doc._id] = true;
           }
-          self._collection.insert(doc);
+
+          docsToInsert.push(doc);
         }
       });
 
+      // Insert into collection shortcutting reactive updates.
+      _.each(docsToInsert, function (doc) {
+        self._collection._docs._map[doc._id] = doc;
+      });
 
+      // Recompute results given new data.
+      _.each(self._collection.queries, function(nextQuery){
+        self._collection._recomputeResults(nextQuery);
+      });
+
+      console.log("DATABASE " + self.name + " LOADED");
       // Setting database loaded, this allows minimongo to be saved into local
       self._databaseLoaded = true;
 
+      self.databaseLoaded.set(true);
     }
 
   });
