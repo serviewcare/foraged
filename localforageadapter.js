@@ -367,7 +367,7 @@ if (_storage) {
                 }
                 else {
                     _.each(keys, function (nextKey) {
-                        _storage.getItem(nextKey, function (item, error) {
+                        self.getItem(nextKey, function (item, error) {
                             keyIndex += 1;
 
                             try {
