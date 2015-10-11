@@ -15,6 +15,7 @@ Package.onUse(function (api) {
     'underscore',
     'minimongo',
     'ejson',
+    'reactive-var',
     'localforage',
     'ground:util@0.1.9',
     'ground:servertime@0.0.3',
