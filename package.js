@@ -17,7 +17,7 @@ Package.onUse(function (api) {
     'ejson',
     'reactive-var',
     'localforage',
-    'ground:util@0.1.9',
+    'ground:util@0.1.17',
     'ground:servertime@0.0.3',
     //'ground:minimax@1.0.1', // Its implied by ground:util
     'ground:localstorage@0.1.7',
