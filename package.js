@@ -45,7 +45,7 @@ Package.onUse(function (api) {
     'wrap.eventemitter.js',
     'wrap.proto.eventemitter.js',
     'localforageadapter.js'
-    ], 'client');
+    ], 'web.cordova');
   api.addFiles('groundDB.server.js', 'server');
 });
 
