@@ -24,7 +24,7 @@ Package.onUse(function (api) {
     'raix:eventemitter@0.1.1',
     'raix:stubfence@1.0.1',
     'raix:onetimeout@1.0.3'
-  ], ['client', 'server']);
+  ], ['web.cordova', 'server']);
 
   // Make sure any storage adapters are loaded first
   // api.use([
@@ -35,7 +35,6 @@ Package.onUse(function (api) {
   api.export('GroundDB');
 
   api.use(['tracker'], 'client');
-
 
   //api.use([], 'server');
   //api.use(['localstorage', 'ejson'], 'client');
