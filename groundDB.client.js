@@ -468,6 +468,13 @@ var _loadDatabase = function() {
 // realiable as possible
 var _saveDatabase = function() {
   var self = this;
+
+  if(self.collection.find().count() === 0 && self._databaseLoaded) { // Collection has been reset!
+	// Reload data
+	_loadDatabase.call(self);
+	return;
+  }
+
   // If data loaded from localstorage then its ok to save - otherwise we
   // would override with less data
   if (self._databaseLoaded && _isReloading === false) {
@@ -850,10 +857,12 @@ var _syncDatabase = function() {
           var newDocs = MiniMaxDB.maxify(data);
 
           self.collection.find().forEach(function(doc) {
-            // Remove document
             self._collection.remove(doc._id);
+
             // If found in new documents then hard update
             if (typeof newDocs[doc._id] !== 'undefined') {
+
+
               // Update doc
               self._collection.insert(newDocs[doc._id]);
               delete newDocs[doc._id];
