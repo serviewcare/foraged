@@ -159,7 +159,7 @@ _groundDbConstructor = function(collection, options) {
   /////// Finally got a name... and rigged
 
   // One timeout pointer for database saves
-  self._saveDatabaseTimeout = new OneTimeout(200);
+  self._saveDatabaseTimeout = new OneTimeout(1000);
 
   // Rig resume for this collection
   if (!self.offlineDatabase && options.resume !== false) {
@@ -459,6 +459,8 @@ var _loadDatabase = function() {
       self._databaseLoaded = true;
 
       self.databaseLoaded.set(true);
+
+      self.storedData = docs;
     }
 
   });
@@ -469,13 +471,29 @@ var _loadDatabase = function() {
 var _saveDatabase = function() {
   var self = this;
 
-  // Always load data from disk into collection before saving, so we never lose data.
-  _loadDatabase.call(self);
-
   // If data loaded from localstorage then its ok to save - otherwise we
   // would override with less data
   if (self._databaseLoaded && _isReloading === false) {
     self._saveDatabaseTimeout(function() {
+      // Restore collection from storage.
+      if(self.storedData) {
+        // Insert into collection shortcutting reactive updates.
+        _.each(self.storedData, function (doc) {
+	  // Restore any documents removed by subscription.
+	  if(!self._collection._docs._map[doc._id]) {
+	    self._collection._docs._map[doc._id] = doc;
+	  }
+        });
+
+        // Recompute results given new data.
+        _.each(self._collection.queries, function(nextQuery){
+          self._collection._recomputeResults(nextQuery);
+        });
+	
+        // Restore altered collection in future.
+        self.storedData = self.collection.find().fetch();	
+      }
+
       // We delay the operation a bit in case of multiple saves - this creates
       // a minor lag in terms of localstorage updating but it limits the num
       // of saves to the database
