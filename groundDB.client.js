@@ -473,26 +473,26 @@ var _saveDatabase = function() {
 
   // If data loaded from localstorage then its ok to save - otherwise we
   // would override with less data
-  if (self._databaseLoaded && _isReloading === false) {
+  if (self._databaseLoaded && _isReloading === false && self.storedData) {
     self._saveDatabaseTimeout(function() {
+      var storedData = [];
       // Restore collection from storage.
-      if(self.storedData) {
-        // Insert into collection shortcutting reactive updates.
-        _.each(self.storedData, function (doc) {
-	  // Restore any documents removed by subscription.
-	  if(!self._collection._docs._map[doc._id]) {
-	    self._collection._docs._map[doc._id] = doc;
-	  }
-        });
+      // Insert into collection shortcutting reactive updates.
+      _.each(self.storedData, function (doc) {
+        // Restore any documents removed by subscription.
+        if(!self._collection._docs._map[doc._id]) {
+          self._collection._docs._map[doc._id] = doc;
+        }
+      });
 
-        // Recompute results given new data.
-        _.each(self._collection.queries, function(nextQuery){
-          self._collection._recomputeResults(nextQuery);
-        });
+      // Recompute results given new data.
+      _.each(self._collection.queries, function(nextQuery){
+        self._collection._recomputeResults(nextQuery);
+      });
 	
-        // Restore altered collection in future.
-        self.storedData = self.collection.find().fetch();	
-      }
+      // Restore altered collection in future.
+      self.storedData = self.collection.find().fetch();	
+      console.log(self._collection.name + " SAVING " + self.storedData.length + " DOCUMENTS.")
 
       // We delay the operation a bit in case of multiple saves - this creates
       // a minor lag in terms of localstorage updating but it limits the num
