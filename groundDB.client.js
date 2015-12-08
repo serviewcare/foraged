@@ -469,11 +469,8 @@ var _loadDatabase = function() {
 var _saveDatabase = function() {
   var self = this;
 
-  if(self.collection.find().count() === 0 && self._databaseLoaded) { // Collection has been reset!
-	// Reload data
-	_loadDatabase.call(self);
-	return;
-  }
+  // Always load data from disk into collection before saving, so we never lose data.
+  _loadDatabase.call(self);
 
   // If data loaded from localstorage then its ok to save - otherwise we
   // would override with less data
