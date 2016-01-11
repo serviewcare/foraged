@@ -501,10 +501,11 @@ var _saveDatabase = function () {
   // If data loaded from localstorage then its ok to save - otherwise we
   // would override with less data
   if (self._databaseLoaded && _isReloading === false && self.storedData) {
+
+    self.dataSaving.set(true);
+
     self._saveDatabaseTimeout(function () {
       console.time('SAVE DATABASE');
-
-      self.dataSaving.set(true);
 
       // Restore collection from storage.
       // Insert into collection shortcutting reactive updates.
@@ -521,7 +522,7 @@ var _saveDatabase = function () {
       if (_.all(newData, function (nextItem) {
           var storedItem = self.storedData[nextItem._id];
 
-          if(_.isUndefined(storedItem)) {
+          if (_.isUndefined(storedItem)) {
             return false;
           }
 
@@ -531,7 +532,7 @@ var _saveDatabase = function () {
         // No changes, do nothing.
         console.log(self._collection.name + " IDENTICAL TO STORED NOT SAVING.");
         console.timeEnd('SAVE DATABASE');
-	self.dataSaving.set(false);
+        self.dataSaving.set(false);
 
         return;
       }
@@ -549,7 +550,7 @@ var _saveDatabase = function () {
       // Restore altered collection in future.
 
       var indexedDocs = {};
-      _.each(self.collection.find().fetch(), function(nextDoc) {
+      _.each(self.collection.find().fetch(), function (nextDoc) {
         indexedDocs[nextDoc._id] = nextDoc;
       });
 
@@ -566,7 +567,7 @@ var _saveDatabase = function () {
       var minifiedDb = MiniMaxDB.minify(_groundUtil.getDatabaseMap(self));
       // Save the collection into localstorage
       self.storage.setItem('data', minifiedDb, function (result, err) {
-	self.dataSaving.set(false);
+        self.dataSaving.set(false);
         // Emit feedback
         if (err) {
           // Emit error
