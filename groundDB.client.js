@@ -222,7 +222,6 @@ _groundDbConstructor = function (collection, options) {
   self._databaseLoaded = false;
 
   self.databaseLoaded = new ReactiveVar(false);
-  self.dataSaving = new ReactiveVar(false);
 
   // Map local-only - this makes sure that localstorage matches remote loaded db
   self._localOnly = {};
@@ -504,8 +503,6 @@ var _saveDatabase = function () {
     self._saveDatabaseTimeout(function () {
       console.time('SAVE DATABASE');
 
-      self.dataSaving.set(true);
-
       // Restore collection from storage.
       // Insert into collection shortcutting reactive updates.
       _.each(self.storedData, function (doc) {
@@ -531,7 +528,6 @@ var _saveDatabase = function () {
         // No changes, do nothing.
         console.log(self._collection.name + " IDENTICAL TO STORED NOT SAVING.");
         console.timeEnd('SAVE DATABASE');
-	self.dataSaving.set(false);
 
         return;
       }
@@ -566,7 +562,6 @@ var _saveDatabase = function () {
       var minifiedDb = MiniMaxDB.minify(_groundUtil.getDatabaseMap(self));
       // Save the collection into localstorage
       self.storage.setItem('data', minifiedDb, function (result, err) {
-	self.dataSaving.set(false);
         // Emit feedback
         if (err) {
           // Emit error
