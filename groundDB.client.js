@@ -464,7 +464,7 @@ var _loadDatabase = function () {
 
       // Insert into collection shortcutting reactive updates.
       _.each(docsToInsert, function (doc) {
-        if (!self._collection._docs._map[doc._id]) {
+        if(!self._collection._docs._map[doc._id]) {
           self._collection._docs._map[doc._id] = doc;
         }
       });
@@ -486,7 +486,7 @@ var _loadDatabase = function () {
 
       self.databaseLoaded.set(true);
 
-      self.storedData = _.clone(docs);
+      self.storedData = docs;
     }
 
   });
@@ -501,57 +501,30 @@ var _saveDatabase = function () {
   // would override with less data
   if (self._databaseLoaded && _isReloading === false && self.storedData) {
     self._saveDatabaseTimeout(function () {
-      console.time('SAVE DATABASE');
-
+      var storedData = [];
       // Restore collection from storage.
       // Insert into collection shortcutting reactive updates.
       _.each(self.storedData, function (doc) {
         // Restore any documents removed by subscription.
-        if (!self._collection._docs._map[doc._id]) {
+        if(!self._collection._docs._map[doc._id]) {
           self._collection._docs._map[doc._id] = doc;
         }
       });
-
-      // Do not save/recompute if there are no changes whatsoever.
-      var newData = self._collection._docs._map;
-
-      if (_.all(newData, function (nextItem) {
-          var storedItem = self.storedData[nextItem._id];
-
-          if(_.isUndefined(storedItem)) {
-            return false;
-          }
-
-          // Artem is smart.
-          return _.isEqual(nextItem.dateUpdated, storedItem.dateUpdated);
-        })) {
-        // No changes, do nothing.
-        console.log(self._collection.name + " IDENTICAL TO STORED NOT SAVING.");
-        console.timeEnd('SAVE DATABASE');
-
-        return;
-      }
 
       // Remove all deleted documents from subscription.
       _.each(self.collection.find({deleted: true}).fetch(), function (nextDeleted) {
         delete self._collection._docs._map[nextDeleted._id];
         delete self.storedData[nextDeleted._id];
       });
+
       // Recompute results given new data.
       _.each(self._collection.queries, function (nextQuery) {
         self._collection._recomputeResults(nextQuery);
       });
 
       // Restore altered collection in future.
-
-      var indexedDocs = {};
-      _.each(self.collection.find().fetch(), function(nextDoc) {
-        indexedDocs[nextDoc._id] = nextDoc;
-      });
-
-      self.storedData = indexedDocs;
-
-      console.log(self._collection.name + " SAVING DOCUMENTS.");
+      self.storedData = self.collection.find().fetch();
+      console.log(self._collection.name + " SAVING " + self.storedData.length + " DOCUMENTS.")
 
       // We delay the operation a bit in case of multiple saves - this creates
       // a minor lag in terms of localstorage updating but it limits the num
