@@ -220,6 +220,7 @@ _groundDbConstructor = function (collection, options) {
 
   // Flag true/false depending if database is loaded from local
   self._databaseLoaded = false;
+  self.dataSaving = new ReactiveVar(false);
 
   self.databaseLoaded = new ReactiveVar(false);
 
@@ -500,6 +501,7 @@ var _saveDatabase = function () {
   // If data loaded from localstorage then its ok to save - otherwise we
   // would override with less data
   if (self._databaseLoaded && _isReloading === false && self.storedData) {
+    self.dataSaving.set(true);
     self._saveDatabaseTimeout(function () {
       var storedData = [];
       // Restore collection from storage.
@@ -535,6 +537,7 @@ var _saveDatabase = function () {
       var minifiedDb = MiniMaxDB.minify(_groundUtil.getDatabaseMap(self));
       // Save the collection into localstorage
       self.storage.setItem('data', minifiedDb, function (result, err) {
+	self.dataSaving.set(false);
         // Emit feedback
         if (err) {
           // Emit error
